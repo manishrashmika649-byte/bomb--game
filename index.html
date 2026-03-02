@@ -21,8 +21,26 @@
             </div>
             <button id="hero-play-btn">PLAY NOW</button>
         </div>
-    </div>
 
-    <script src="script.js"></script>
+        <div id="auth-screen" class="hidden">
+            <div id="login-form">
+                <h2>AGENT ACCESS</h2>
+                <h3>LOGIN</h3>
+                <input type="text" id="login-user" placeholder="Username">
+                <input type="password" id="login-pass" placeholder="Password">
+                <br><br>
+                <button id="login-submit-btn">LOGIN</button>
+                <p class="auth-toggle-text">New Agent? <a href="#" id="to-register" class="auth-link">[ REGISTER HERE ]</a></p>
+            </div>
+
+            <div id="register-form" class="hidden">
+                <h2>AGENT REGISTRATION</h2>
+                <input type="text" id="reg-user" placeholder="Choose Username">
+                <input type="password" id="reg-pass" placeholder="Choose Password">
+                <br><br>
+                <button id="register-submit-btn">REGISTER</button>
+                <p class="auth-toggle-text">Already have an account? <a href="#" id="to-login" class="auth-link">[ LOGIN HERE ]</a></p>
+            </div>
+        </div>
+    </div> <script src="script.js"></script>
 </body>
-</html>

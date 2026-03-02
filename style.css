@@ -1,0 +1,96 @@
+:root {
+    --cyan: #00ff00; 
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--cyan);
+    font-family: 'Courier New', monospace;
+    
+    /* 🌑 Background opacity fix - මෙතනට hack_img.jpg එක ඕනේ */
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), 
+                url('hack_img.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* මුළු මැසේජ් බොක්ස් එකම */
+.mission-control {
+    text-align: center;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    padding: 30px;
+    background: rgba(0, 20, 0, 0.4); 
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+    width: 480px;
+    border-radius: 12px;
+    position: relative;
+}
+
+/* --- 💥 EXPLOSION LOGO STYLES --- */
+#intro-screen { 
+    padding: 20px 0; 
+    position: relative;
+    min-height: 220px; 
+}
+
+.main-game-title {
+    width: 600px;       /* Logo width */
+    height: 350px;      /* Logo height */
+    position: absolute; 
+    top: 35%;           
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    
+    /* මෙතනට logo.png එක ඕනේ */
+    background: url('logo.png') no-repeat center center;
+    background-size: contain;
+    filter: drop-shadow(0 0 15px rgba(0, 255, 0, 0.6)); 
+    z-index: 5;
+    animation: pulseLogo 3s infinite ease-in-out;
+    
+    /* Text hide karanna */
+    text-indent: -9999px;
+}
+
+.mission-protocol { 
+    font-size: 12px; 
+    opacity: 0.8; 
+    letter-spacing: 2px; 
+    position: relative;
+    z-index: 6; 
+    margin-top: 140px; 
+}
+
+/* --- 🟢 THE PLAY NOW BUTTON --- */
+#hero-play-btn {
+    background: #39FF14 !important;
+    color: #000 !important;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 15px 50px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.6);
+    transition: 0.3s;
+    font-family: 'Rajdhani', sans-serif;
+    width: 90%;
+    position: relative;
+    z-index: 6;
+}
+#hero-play-btn:hover { background: #00ff00 !important; transform: scale(1.05); }
+
+/* --- ANIMATIONS --- */
+@keyframes pulseLogo { 
+    0% { transform: translate(-50%, -50%) scale(1); } 
+    50% { transform: translate(-50%, -50%) scale(1.15); } 
+    100% { transform: translate(-50%, -50%) scale(1); } 
+}
+
+/* Utility Class */
+.hidden { display: none !important; }

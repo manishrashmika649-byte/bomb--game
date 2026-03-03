@@ -52,7 +52,7 @@ function handleAuth(type) {
         pass = document.getElementById('reg-pass').value;
     }
 
-    if(!user || !pass) return alert("කරුණාකර Username සහ Password ඇතුළත් කරන්න!");
+    if(!user || !pass) return alert("enter your username and password");
     
     let fd = new FormData();
     fd.append('action', type); 

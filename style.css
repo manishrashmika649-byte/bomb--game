@@ -81,12 +81,66 @@ body {
 }
 #hero-play-btn:hover { background: #00ff00 !important; transform: scale(1.05); }
 
-/* --- ANIMATIONS */
+/* --- ANIMATIONS --- */
 @keyframes pulseLogo { 
     0% { transform: translate(-50%, -50%) scale(1); } 
     50% { transform: translate(-50%, -50%) scale(1.15); } 
     100% { transform: translate(-50%, -50%) scale(1); } 
 }
 
-/* Utility Class */
-.hidden { display: none !important; }
+/* --- Authentication Screens --- */
+.auth-toggle-text {
+    font-size: 13px; 
+    margin-top: 15px;
+}
+
+.auth-link {
+    color: #ffff00; 
+    text-decoration: none;
+}
+
+
+/*  LOGIN & REGISTRATION SPECIFIC CSS /
+
+/* 1. Input fields */
+input { 
+    background: #000; 
+    border: 1px solid var(--cyan); 
+    color: var(--cyan); 
+    padding: 10px; 
+    width: 80%; 
+    margin-bottom: 10px; 
+    outline: none; 
+}
+
+/* 2. Buttons (Log) */
+button { 
+    background: #000; 
+    color: var(--cyan); 
+    border: 1px solid var(--cyan); 
+    padding: 10px 20px; 
+    cursor: pointer; 
+    transition: 0.3s; 
+    font-family: 'Courier New'; 
+}
+
+button:hover { 
+    background: var(--cyan); 
+    color: #000; 
+}
+
+/* 3. Auth Screens  */
+.auth-toggle-text {
+    font-size: 13px; 
+    margin-top: 15px;
+}
+
+.auth-link {
+    color: #ffff00; 
+    text-decoration: none;
+}
+
+/* 4. Utility Cla  */
+.hidden { 
+    display: none !important; 
+}

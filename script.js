@@ -6,15 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 1. PLAY NOW event listener 
     document.getElementById('hero-play-btn').addEventListener('click', () => {
-       // alert("System Booting... Authentication Required!");
         enterGame(); 
     });
 
- 
     document.getElementById('login-submit-btn').addEventListener('click', () => handleAuth('login'));
     document.getElementById('register-submit-btn').addEventListener('click', () => handleAuth('register'));
     
-   
     document.getElementById('to-register').addEventListener('click', (e) => { 
         e.preventDefault(); 
         toggleAuthMode('register'); 
@@ -25,20 +22,43 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleAuthMode('login'); 
     });
 
-   
     document.getElementById('logout-btn').addEventListener('click', logout);
+
+    
+    let savedUser = getCookie('loggedUser');
+    if (savedUser) {
+        currentAgent = savedUser;
+        showMainMenu();
+    }
 });
 
 // --- SCREEN CONTROL ---
 
 function enterGame() {
-    
     const screens = ['intro-screen', 'auth-screen', 'main-menu', 'game-screen'];
     screens.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
     });
     document.getElementById('auth-screen').classList.remove('hidden');
+}
+
+// show menu
+function showMainMenu() {
+    const screens = ['intro-screen', 'auth-screen', 'main-menu', 'game-screen'];
+    screens.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+    
+    const menu = document.getElementById('main-menu');
+    if (menu) {
+        menu.classList.remove('hidden');
+        
+        document.getElementById('welcome-text').innerText = `WELCOME, AGENT ${currentAgent.toUpperCase()}`;
+        
+        
+    }
 }
 
 // --- AUTHENTICATION ---
@@ -59,15 +79,16 @@ function handleAuth(type) {
     fd.append('username', user); 
     fd.append('password', pass);
 
-    
-
     fetch('auth.php', { method: 'POST', body: fd })
     .then(res => res.text())
     .then(data => {
         if (data.trim() === "success") {
             setCookie('loggedUser', user, 7);
             currentAgent = user;
-            alert("✅ " + type.toUpperCase() + " SUCCESSFUL!\nWelcome back, Agent " + user);
+            
+            
+            showMainMenu();
+            
         } else {
             alert("❌ " + data);
         }
@@ -84,7 +105,13 @@ function toggleAuthMode(mode) {
     }
 }
 
-//  (Cookies ) ---
+// --- UTILITIES ---
+
+  
+
+
+
+// (Cookies) ---
 function logout() { 
     setCookie('loggedUser', '', -1); 
     alert("Logged out successfully!");

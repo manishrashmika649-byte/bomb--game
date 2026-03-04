@@ -57,7 +57,7 @@ function showMainMenu() {
         
         document.getElementById('welcome-text').innerText = `WELCOME, AGENT ${currentAgent.toUpperCase()}`;
         
-        
+        fetchAgentAdvice();
     }
 }
 
@@ -105,7 +105,17 @@ function toggleAuthMode(mode) {
     }
 }
 
-// --- UTILITIES ---
+// advice api//
+
+function fetchAgentAdvice() {
+    const adviceBox = document.getElementById('agent-advice');
+    if(!adviceBox) return;
+    fetch('https://api.adviceslip.com/advice')
+    .then(res => res.json())
+    .then(data => { 
+        adviceBox.innerText = `"${data.slip.advice}"`; 
+    });
+}
 
   
 

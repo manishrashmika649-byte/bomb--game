@@ -42,5 +42,44 @@
                 <p class="auth-toggle-text">Already have an account? <a href="#" id="to-login" class="auth-link">[ LOGIN HERE ]</a></p>
             </div>
         </div>
+          
+         <div id="main-menu" class="hidden">
+            <h2 class="menu-header">[ MAIN MENU 💣💣]</h2>
+            <h2 id="welcome-text">WELCOME, AGENT</h2>
+            <div class="advice-section">
+                <span class="hq-label">[ HQ INCOMING MESSAGE ]</span>
+                <p id="agent-advice">DECRYPTING SECURE INTEL...</p>
+            </div>
+            <div class="menu-box-container">
+                <div class="difficulty-wrapper">
+                    <button id="diff-main-btn">
+                        DIFFICULTY: <span id="current-diff-label">MEDIUM</span> ⚙️
+                    </button>
+                    <div id="difficulty-options" class="hidden">
+                        <button class="diff-opt" data-level="easy" id="opt-easy">EASY (3 mins)</button>
+                        <button class="diff-opt" data-level="medium" id="opt-medium">MEDIUM (2 mins)</button>
+                        <button class="diff-opt" data-level="hard" id="opt-hard">HARD (1 min)</button>
+                    </div>
+                </div>
+                <button id="start-mission-btn" class="menu-action-btn">START MISSION</button>
+                <button id="how-to-play-btn" class="menu-action-btn">HOW TO PLAY</button>
+                <button id="logout-btn" class="menu-action-btn">LOGOUT</button>
+            </div>
+        </div>
+
+        <div id="instructions-modal" class="hidden">
+            <div class="modal-content">
+                <h3 class="modal-title">MISSION PROTOCOL</h3>
+                <ul class="modal-list">
+                    <li>Solve 10 math equations to stop the timer.</li>
+                    <li>Each wrong answer costs 5-15 seconds penalty!</li>
+                    <li>Choose difficulty to change the starting timer.</li>
+                    <li>Register to save your best defuse time.</li>
+                </ul>
+                <button id="close-instructions-btn" class="modal-close-btn">UNDERSTOOD</button>
+            </div>
+        </div>
+
+
     </div> <script src="script.js"></script>
 </body>

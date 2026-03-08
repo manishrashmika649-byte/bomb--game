@@ -1,4 +1,3 @@
-
 // 1. --- GLOBAL VARIABLES ---
 
 let currentAgent = "";
@@ -150,6 +149,7 @@ function handleAnswer(num) {
         document.getElementById('score').innerText = score;
         if(score >= 10) {
             clearInterval(timer);
+            saveScore(score); 
             alert("🏆 MISSION ACCOMPLISHED! BOMB DEFUSED!");
             showMainMenu();
         } else {
@@ -171,6 +171,7 @@ function startTimer() {
         document.getElementById('timer').innerText = (timeLeft < 0) ? 0 : timeLeft;
         if(timeLeft <= 0) {
             clearInterval(timer);
+            saveScore(score); 
             alert("💥 BOOM! MISSION FAILED!");
             showMainMenu();
         }
@@ -262,4 +263,28 @@ function getCookie(n) {
         if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
     }
     return null;
+}
+
+// 6. --- SAVE SCORE ---
+
+function saveScore(val) {
+    let fd = new FormData();
+    fd.append('agent_name', currentAgent); 
+    fd.append('score', val);
+    
+    fetch('save_score.php', { 
+        method: 'POST', 
+        body: fd 
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log("Server Response:", data); 
+        
+        if (data.includes("Score saved successfully")) {
+            console.log("Database update: SUCCESS!");
+        } else {
+            console.warn("Database update: FAILED!");
+        }
+    })
+    .catch(error => console.error('Error connecting to server:', error));
 }

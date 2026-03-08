@@ -80,6 +80,24 @@
             </div>
         </div>
 
+         <div id="game-screen" class="hidden">
+            <div class="status-bar">
+                <div class="agent-display-box">
+                    <span id="agent-name-display">AGENT</span><br>
+                    <small id="best-stats"></small>
+                </div>
+                <div class="stats-display-box">
+                    TIME: <span id="timer">0</span>s | SCORE: <span id="score">0</span>/10
+                </div>
+            </div>
+            <div class="circuit-board" id="board-container">
+                <img id="puzzle-img" src="" alt="Decrypting...">
+                <div id="blast-zone" class="hidden"></div>
+            </div>
+            <p class="instruction-text">CHOOSE THE CORRECT NUMBER</p>
+            <div class="keypad" id="keypad"></div>
+        </div>
+
 
     </div> <script src="script.js"></script>
 </body>

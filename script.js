@@ -1,8 +1,17 @@
-// --- GLOBAL VARIABLES ---
+
+// 1. --- GLOBAL VARIABLES ---
+
 let currentAgent = "";
 let selectedDifficulty = 'medium'; // Default difficulty
+let score = 0;
+let timeLeft = 120;
+let timer;
+let currentAnswer;
+let penalty = 10;
 
-// --- INITIALIZATION ---
+
+// 2. --- INITIALIZATION ---
+
 document.addEventListener('DOMContentLoaded', () => {
     
     // 1. PLAY NOW (Intro to Auth)
@@ -25,10 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 3. MAIN MENU Buttons
-    document.getElementById('start-mission-btn').addEventListener('click', () => {
-        alert("Starting Mission with " + selectedDifficulty.toUpperCase() + " difficulty...");
-      
-    });
+    document.getElementById('start-mission-btn').addEventListener('click', showGame);
 
     document.getElementById('how-to-play-btn').addEventListener('click', () => toggleInstructions(true));
     document.getElementById('close-instructions-btn').addEventListener('click', () => toggleInstructions(false));
@@ -53,10 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- SCREEN CONTROL ---
+
+// 3. --- SCREEN CONTROL ---
+
 
 function hideAllScreens() {
-    
     const screens = ['intro-screen', 'auth-screen', 'main-menu', 'game-screen', 'instructions-modal'];
     screens.forEach(id => {
         const el = document.getElementById(id);
@@ -79,7 +86,6 @@ function showMainMenu() {
     }
 }
 
-// How to Play Modal Control
 function toggleInstructions(show) { 
     const modal = document.getElementById('instructions-modal');
     if (modal) {
@@ -87,19 +93,94 @@ function toggleInstructions(show) {
     }
 }
 
-// --- DIFFICULTY LOGIC ---
-function toggleDifficultyMenu() {
-    const options = document.getElementById('difficulty-options');
-    if (options) options.classList.toggle('hidden');
+
+// 4. --- GAME LOGIC (Gameplay) ---
+
+
+function showGame() {
+    // Difficulty panelty
+    if(selectedDifficulty === 'easy') { timeLeft = 180; penalty = 5; }
+    else if(selectedDifficulty === 'medium') { timeLeft = 120; penalty = 10; }
+    else { timeLeft = 60; penalty = 20; }
+
+    hideAllScreens();
+    document.getElementById('game-screen').classList.remove('hidden');
+    document.getElementById('agent-name-display').innerText = `AGENT: ${currentAgent.toUpperCase()}`;
+    
+    resetGame(timeLeft);
+    loadPuzzle();
+    startTimer();
 }
 
-function selectLevel(level) {
-    selectedDifficulty = level;
-    document.getElementById('current-diff-label').innerText = level.toUpperCase();
-    toggleDifficultyMenu();
+function resetGame(t) {
+    score = 0; 
+    timeLeft = t;
+    document.getElementById('score').innerText = "0";
+    document.getElementById('timer').innerText = timeLeft;
 }
 
-// --- AUTHENTICATION ---
+async function loadPuzzle() {
+    const res = await fetch('https://marcconrad.com/uob/banana/api.php');
+    const data = await res.json();
+    document.getElementById('puzzle-img').src = data.question;
+    currentAnswer = data.solution;
+    generateKeypad(currentAnswer);
+}
+
+function generateKeypad(correct) {
+    const keypad = document.getElementById('keypad');
+    keypad.innerHTML = '';
+    let opts = [correct];
+    while(opts.length < 4) {
+        let r = Math.floor(Math.random() * 10);
+        if(!opts.includes(r)) opts.push(r);
+    }
+    opts.sort(() => Math.random() - 0.5).forEach(num => {
+        const btn = document.createElement('button');
+        btn.innerText = num;
+        btn.className = "keypad-btn";
+        btn.onclick = () => handleAnswer(num);
+        keypad.appendChild(btn);
+    });
+}
+
+function handleAnswer(num) {
+    if(num == currentAnswer) {
+        score++;
+        document.getElementById('score').innerText = score;
+        if(score >= 10) {
+            clearInterval(timer);
+            alert("🏆 MISSION ACCOMPLISHED! BOMB DEFUSED!");
+            showMainMenu();
+        } else {
+            loadPuzzle();
+        }
+    } else {
+        timeLeft -= penalty;
+        // Shake animation for feedback
+        const container = document.getElementById('board-container');
+        container.classList.add('shake');
+        setTimeout(() => container.classList.remove('shake'), 500);
+    }
+}
+
+function startTimer() {
+    if(timer) clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').innerText = (timeLeft < 0) ? 0 : timeLeft;
+        if(timeLeft <= 0) {
+            clearInterval(timer);
+            alert("💥 BOOM! MISSION FAILED!");
+            showMainMenu();
+        }
+    }, 1000);
+}
+
+
+// 5. --- AUTHENTICATION & UTILITIES ---
+
+
 function handleAuth(type) {
     let user, pass;
     if (type === 'login') {
@@ -140,7 +221,17 @@ function toggleAuthMode(mode) {
     }
 }
 
-// Advice API
+function toggleDifficultyMenu() {
+    const options = document.getElementById('difficulty-options');
+    if (options) options.classList.toggle('hidden');
+}
+
+function selectLevel(level) {
+    selectedDifficulty = level;
+    document.getElementById('current-diff-label').innerText = level.toUpperCase();
+    toggleDifficultyMenu();
+}
+
 function fetchAgentAdvice() {
     const adviceBox = document.getElementById('agent-advice');
     if(!adviceBox) return;
@@ -151,7 +242,6 @@ function fetchAgentAdvice() {
     });
 }
 
-// --- UTILITIES (Cookies & Logout) ---
 function logout() { 
     setCookie('loggedUser', '', -1); 
     alert("Logged out successfully!");

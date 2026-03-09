@@ -106,6 +106,23 @@ function showGame() {
     document.getElementById('game-screen').classList.remove('hidden');
     document.getElementById('agent-name-display').innerText = `AGENT: ${currentAgent.toUpperCase()}`;
     
+    //  FETCH BEST SCORE 
+    fetch(`get_player_best.php?username=${currentAgent}`)
+    .then(res => res.json())
+    .then(data => {
+        const bestDisplay = document.getElementById('best-stats');
+        if (bestDisplay) {
+            if (data.best_time > 0) {
+                bestDisplay.innerHTML = `BEST RECORD: <span style="color: #00ff00;">${data.best_time}s Left 🏆</span>`;
+            } else if (data.best_score > 0) {
+                bestDisplay.innerHTML = `BEST ATTEMPT: ${data.best_score}/10 Marks 🎯`;
+            } else {
+                bestDisplay.innerHTML = `MISSION: NEW RECRUIT 🏁`;
+            }
+        }
+    })
+    .catch(err => console.error("Error fetching stats:", err));
+
     resetGame(timeLeft);
     loadPuzzle();
     startTimer();
@@ -149,7 +166,8 @@ function handleAnswer(num) {
         document.getElementById('score').innerText = score;
         if(score >= 10) {
             clearInterval(timer);
-            saveScore(score); 
+            
+            saveScore(timeLeft); 
             alert("🏆 MISSION ACCOMPLISHED! BOMB DEFUSED!");
             showMainMenu();
         } else {
@@ -171,6 +189,7 @@ function startTimer() {
         document.getElementById('timer').innerText = (timeLeft < 0) ? 0 : timeLeft;
         if(timeLeft <= 0) {
             clearInterval(timer);
+           
             saveScore(score); 
             alert("💥 BOOM! MISSION FAILED!");
             showMainMenu();

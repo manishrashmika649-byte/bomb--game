@@ -1,8 +1,16 @@
-// --- GLOBAL VARIABLES ---
+// 1. --- GLOBAL VARIABLES ---
+
 let currentAgent = "";
 let selectedDifficulty = 'medium'; // Default difficulty
+let score = 0;
+let timeLeft = 120;
+let timer;
+let currentAnswer;
+let penalty = 10;
 
-// --- INITIALIZATION ---
+
+// 2. --- INITIALIZATION ---
+
 document.addEventListener('DOMContentLoaded', () => {
     
     // 1. PLAY NOW (Intro to Auth)
@@ -25,14 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 3. MAIN MENU Buttons
-    document.getElementById('start-mission-btn').addEventListener('click', () => {
-        alert("Starting Mission with " + selectedDifficulty.toUpperCase() + " difficulty...");
-      
-    });
+    document.getElementById('start-mission-btn').addEventListener('click', showGame);
 
     document.getElementById('how-to-play-btn').addEventListener('click', () => toggleInstructions(true));
     document.getElementById('close-instructions-btn').addEventListener('click', () => toggleInstructions(false));
-    
+    document.getElementById('show-dashboard-btn').addEventListener('click', showDashboard);
     document.getElementById('logout-btn').addEventListener('click', logout);
 
     // 4. DIFFICULTY Selection Logic
@@ -45,6 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    
+    document.getElementById('back-to-menu-btn').addEventListener('click', showMainMenu);
+
     // Check for existing session
     let savedUser = getCookie('loggedUser');
     if (savedUser) {
@@ -53,11 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- SCREEN CONTROL ---
+
+// 3. --- SCREEN CONTROL ---
 
 function hideAllScreens() {
     
-    const screens = ['intro-screen', 'auth-screen', 'main-menu', 'game-screen', 'instructions-modal'];
+    const screens = ['intro-screen', 'auth-screen', 'main-menu', 'game-screen', 'instructions-modal', 'dashboard'];
     screens.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
@@ -79,7 +88,6 @@ function showMainMenu() {
     }
 }
 
-// How to Play Modal Control
 function toggleInstructions(show) { 
     const modal = document.getElementById('instructions-modal');
     if (modal) {
@@ -87,19 +95,108 @@ function toggleInstructions(show) {
     }
 }
 
-// --- DIFFICULTY LOGIC ---
-function toggleDifficultyMenu() {
-    const options = document.getElementById('difficulty-options');
-    if (options) options.classList.toggle('hidden');
+
+// 4. --- GAME LOGIC (Gameplay) ---
+
+function showGame() {
+    // Difficulty penalty
+    if(selectedDifficulty === 'easy') { timeLeft = 180; penalty = 5; }
+    else if(selectedDifficulty === 'medium') { timeLeft = 120; penalty = 10; }
+    else { timeLeft = 60; penalty = 20; }
+
+    hideAllScreens();
+    document.getElementById('game-screen').classList.remove('hidden');
+    document.getElementById('agent-name-display').innerText = `AGENT: ${currentAgent.toUpperCase()}`;
+    
+    //  FETCH BEST SCORE 
+    fetch(`get_player_best.php?username=${currentAgent}`)
+    .then(res => res.json())
+    .then(data => {
+        const bestDisplay = document.getElementById('best-stats');
+        if (bestDisplay) {
+            if (data.best_time > 0) {
+                bestDisplay.innerHTML = `BEST RECORD: <span style="color: #00ff00;">${data.best_time}s Left 🏆</span>`;
+            } else if (data.best_score > 0) {
+                bestDisplay.innerHTML = `BEST ATTEMPT: ${data.best_score}/10 Marks 🎯`;
+            } else {
+                bestDisplay.innerHTML = `MISSION: NEW RECRUIT 🏁`;
+            }
+        }
+    })
+    .catch(err => console.error("Error fetching stats:", err));
+
+    resetGame(timeLeft);
+    loadPuzzle();
+    startTimer();
 }
 
-function selectLevel(level) {
-    selectedDifficulty = level;
-    document.getElementById('current-diff-label').innerText = level.toUpperCase();
-    toggleDifficultyMenu();
+function resetGame(t) {
+    score = 0; 
+    timeLeft = t;
+    document.getElementById('score').innerText = "0";
+    document.getElementById('timer').innerText = timeLeft;
 }
 
-// --- AUTHENTICATION ---
+async function loadPuzzle() {
+    const res = await fetch('https://marcconrad.com/uob/banana/api.php');
+    const data = await res.json();
+    document.getElementById('puzzle-img').src = data.question;
+    currentAnswer = data.solution;
+    generateKeypad(currentAnswer);
+}
+
+function generateKeypad(correct) {
+    const keypad = document.getElementById('keypad');
+    keypad.innerHTML = '';
+    let opts = [correct];
+    while(opts.length < 4) {
+        let r = Math.floor(Math.random() * 10);
+        if(!opts.includes(r)) opts.push(r);
+    }
+    opts.sort(() => Math.random() - 0.5).forEach(num => {
+        const btn = document.createElement('button');
+        btn.innerText = num;
+        btn.className = "keypad-btn";
+        btn.onclick = () => handleAnswer(num);
+        keypad.appendChild(btn);
+    });
+}
+
+function handleAnswer(num) {
+    if(num == currentAnswer) {
+        score++;
+        document.getElementById('score').innerText = score;
+        if(score >= 10) {
+            clearInterval(timer);
+            saveScore(timeLeft); 
+            alert("🏆 MISSION ACCOMPLISHED! BOMB DEFUSED!");
+            showDashboard(); 
+        } else {
+            loadPuzzle();
+        }
+    } else {
+        timeLeft -= penalty;
+      
+    }
+}
+
+function startTimer() {
+    if(timer) clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').innerText = (timeLeft < 0) ? 0 : timeLeft;
+        if(timeLeft <= 0) {
+            clearInterval(timer);
+            saveScore(score); 
+            alert("💥 BOOM! MISSION FAILED!");
+            showDashboard(); 
+        }
+    }, 1000);
+}
+
+
+// 5. --- AUTHENTICATION & UTILITIES ---
+
 function handleAuth(type) {
     let user, pass;
     if (type === 'login') {
@@ -140,7 +237,17 @@ function toggleAuthMode(mode) {
     }
 }
 
-// Advice API
+function toggleDifficultyMenu() {
+    const options = document.getElementById('difficulty-options');
+    if (options) options.classList.toggle('hidden');
+}
+
+function selectLevel(level) {
+    selectedDifficulty = level;
+    document.getElementById('current-diff-label').innerText = level.toUpperCase();
+    toggleDifficultyMenu();
+}
+
 function fetchAgentAdvice() {
     const adviceBox = document.getElementById('agent-advice');
     if(!adviceBox) return;
@@ -151,7 +258,6 @@ function fetchAgentAdvice() {
     });
 }
 
-// --- UTILITIES (Cookies & Logout) ---
 function logout() { 
     setCookie('loggedUser', '', -1); 
     alert("Logged out successfully!");
@@ -172,4 +278,41 @@ function getCookie(n) {
         if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
     }
     return null;
+}
+
+// 6. --- SAVE SCORE & DASHBOARD ---
+
+function saveScore(val) {
+    let fd = new FormData();
+    fd.append('agent_name', currentAgent); 
+    fd.append('score', val);
+    
+    fetch('save_score.php', { 
+        method: 'POST', 
+        body: fd 
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log("Server Response:", data); 
+    })
+    .catch(error => console.error('Error connecting to server:', error));
+}
+
+function showDashboard() {
+    fetch('get_scores.php')
+    .then(res => res.json())
+    .then(data => {
+        const body = document.getElementById('leaderboard-body');
+        if (body) {
+            body.innerHTML = data.map(row => `
+                <tr>
+                    <td>${row.agent_name}</td>
+                    <td>${row.top_score}s Left</td>
+                </tr>`).join('');
+        }
+        hideAllScreens();
+        const dash = document.getElementById('dashboard');
+        if (dash) dash.classList.remove('hidden');
+    })
+    .catch(err => console.error("Error loading dashboard:", err));
 }

@@ -50,6 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    
+    document.getElementById('back-to-menu-btn').addEventListener('click', showMainMenu);
+
     // Check for existing session
     let savedUser = getCookie('loggedUser');
     if (savedUser) {
@@ -61,9 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 3. --- SCREEN CONTROL ---
 
-
 function hideAllScreens() {
-    const screens = ['intro-screen', 'auth-screen', 'main-menu', 'game-screen', 'instructions-modal'];
+    
+    const screens = ['intro-screen', 'auth-screen', 'main-menu', 'game-screen', 'instructions-modal', 'dashboard'];
     screens.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
@@ -95,9 +98,8 @@ function toggleInstructions(show) {
 
 // 4. --- GAME LOGIC (Gameplay) ---
 
-
 function showGame() {
-    // Difficulty panelty
+    // Difficulty penalty
     if(selectedDifficulty === 'easy') { timeLeft = 180; penalty = 5; }
     else if(selectedDifficulty === 'medium') { timeLeft = 120; penalty = 10; }
     else { timeLeft = 60; penalty = 20; }
@@ -166,19 +168,15 @@ function handleAnswer(num) {
         document.getElementById('score').innerText = score;
         if(score >= 10) {
             clearInterval(timer);
-            
             saveScore(timeLeft); 
             alert("🏆 MISSION ACCOMPLISHED! BOMB DEFUSED!");
-            showMainMenu();
+            showDashboard(); 
         } else {
             loadPuzzle();
         }
     } else {
         timeLeft -= penalty;
-        // Shake animation for feedback
-        const container = document.getElementById('board-container');
-        container.classList.add('shake');
-        setTimeout(() => container.classList.remove('shake'), 500);
+      
     }
 }
 
@@ -189,17 +187,15 @@ function startTimer() {
         document.getElementById('timer').innerText = (timeLeft < 0) ? 0 : timeLeft;
         if(timeLeft <= 0) {
             clearInterval(timer);
-           
             saveScore(score); 
             alert("💥 BOOM! MISSION FAILED!");
-            showMainMenu();
+            showDashboard(); 
         }
     }, 1000);
 }
 
 
 // 5. --- AUTHENTICATION & UTILITIES ---
-
 
 function handleAuth(type) {
     let user, pass;
@@ -284,7 +280,7 @@ function getCookie(n) {
     return null;
 }
 
-// 6. --- SAVE SCORE ---
+// 6. --- SAVE SCORE & DASHBOARD ---
 
 function saveScore(val) {
     let fd = new FormData();
@@ -298,12 +294,25 @@ function saveScore(val) {
     .then(response => response.text())
     .then(data => {
         console.log("Server Response:", data); 
-        
-        if (data.includes("Score saved successfully")) {
-            console.log("Database update: SUCCESS!");
-        } else {
-            console.warn("Database update: FAILED!");
-        }
     })
     .catch(error => console.error('Error connecting to server:', error));
+}
+
+function showDashboard() {
+    fetch('get_scores.php')
+    .then(res => res.json())
+    .then(data => {
+        const body = document.getElementById('leaderboard-body');
+        if (body) {
+            body.innerHTML = data.map(row => `
+                <tr>
+                    <td>${row.agent_name}</td>
+                    <td>${row.top_score}s Left</td>
+                </tr>`).join('');
+        }
+        hideAllScreens();
+        const dash = document.getElementById('dashboard');
+        if (dash) dash.classList.remove('hidden');
+    })
+    .catch(err => console.error("Error loading dashboard:", err));
 }

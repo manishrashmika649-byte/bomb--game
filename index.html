@@ -42,8 +42,8 @@
                 <p class="auth-toggle-text">Already have an account? <a href="#" id="to-login" class="auth-link">[ LOGIN HERE ]</a></p>
             </div>
         </div>
-          
-         <div id="main-menu" class="hidden">
+
+        <div id="main-menu" class="hidden">
             <h2 class="menu-header">[ MAIN MENU 💣💣]</h2>
             <h2 id="welcome-text">WELCOME, AGENT</h2>
             <div class="advice-section">
@@ -67,20 +67,7 @@
             </div>
         </div>
 
-        <div id="instructions-modal" class="hidden">
-            <div class="modal-content">
-                <h3 class="modal-title">MISSION PROTOCOL</h3>
-                <ul class="modal-list">
-                    <li>Solve 10 math equations to stop the timer.</li>
-                    <li>Each wrong answer costs 5-15 seconds penalty!</li>
-                    <li>Choose difficulty to change the starting timer.</li>
-                    <li>Register to save your best defuse time.</li>
-                </ul>
-                <button id="close-instructions-btn" class="modal-close-btn">UNDERSTOOD</button>
-            </div>
-        </div>
-
-         <div id="game-screen" class="hidden">
+        <div id="game-screen" class="hidden">
             <div class="status-bar">
                 <div class="agent-display-box">
                     <span id="agent-name-display">AGENT</span><br>
@@ -98,6 +85,25 @@
             <div class="keypad" id="keypad"></div>
         </div>
 
+        <div id="dashboard" class="hidden">
+            <h3>TOP AGENTS</h3>
+            <table class="leaderboard-table">
+                <tbody id="leaderboard-body"></tbody>
+            </table>
+            <button id="back-to-menu-btn">BACK TO MENU</button>
+        </div>
 
-    </div> <script src="script.js"></script>
+        <div id="instructions-modal" class="hidden">
+            <h3 class="modal-title">MISSION PROTOCOL</h3>
+            <ul class="modal-list">
+                <li>Solve 10 math equations to stop the timer.</li>
+                <li>Each wrong answer costs 5-15 seconds!</li>
+                <li>Choose difficulty to change the timer.</li>
+                <li>Register to save your best defuse time.</li>
+            </ul>
+            <button id="close-instructions-btn" class="modal-close-btn">UNDERSTOOD</button>
+        </div>
+    </div>
+    <script src="script.js?v=1.3"></script>
 </body>
+</html>

@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('how-to-play-btn').addEventListener('click', () => toggleInstructions(true));
     document.getElementById('close-instructions-btn').addEventListener('click', () => toggleInstructions(false));
-    
+    document.getElementById('show-dashboard-btn').addEventListener('click', showDashboard);
     document.getElementById('logout-btn').addEventListener('click', logout);
 
     // 4. DIFFICULTY Selection Logic

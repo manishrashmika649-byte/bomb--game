@@ -1,19 +1,17 @@
 <?php
+session_start(); 
 include 'db.php';
 
 
-$name = $_POST['agent_name'];
-$score = $_POST['score'];
+if (isset($_SESSION['agent_name'])) {
+    $name = $_SESSION['agent_name'];
+    $score = $_POST['score'];
 
-// 1. Query select
-$stmt = $conn->prepare("INSERT INTO scores (agent_name, score) VALUES (?, ?)");
+    $stmt = $conn->prepare("INSERT INTO scores (agent_name, score) VALUES (?, ?)");
+    $stmt->bind_param("si", $name, $score);
+    $stmt->execute();
+    $stmt->close();
+}
 
-
-$stmt->bind_param("si", $name, $score); 
-
-// 3. Query execute 
-$stmt->execute();
-
-$stmt->close();
 $conn->close();
 ?>

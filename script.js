@@ -43,29 +43,51 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-//  AUTHENTICATION LOGIC 
+
+//  AUTHENTICATION LOGIC (UPDATED) 
 
 function handleAuth(type) {
-    const user = document.getElementById(type === 'login' ? 'login-user' : 'reg-user').value;
-    const pass = document.getElementById(type === 'login' ? 'login-pass' : 'reg-pass').value;
-
-    if(!user || !pass) return alert("Credentials required!");
-    
     let fd = new FormData();
-    fd.append('action', type); 
-    fd.append('username', user); 
-    fd.append('password', pass);
+    fd.append('action', type);
+
+    if (type === 'register') {
+        const u = document.getElementById('reg-user').value;
+        const e = document.getElementById('reg-email').value; 
+        const p = document.getElementById('reg-pass').value;
+
+        if (!u || !e || !p) return alert("All fields are required for registration!");
+
+        fd.append('username', u);
+        fd.append('email', e);
+        fd.append('password', p);
+    } else {
+        const u = document.getElementById('login-user').value;
+        const p = document.getElementById('login-pass').value;
+
+        if (!u || !p) return alert("Credentials required!");
+
+        fd.append('username', u);
+        fd.append('password', p);
+    }
 
     fetch('auth.php', { method: 'POST', body: fd })
     .then(res => res.text())
     .then(data => {
-        if (data.trim() === "success") {
-            currentAgent = user;
-            showMainMenu();
+        const response = data.trim();
+        if (response === "success") {
+            if (type === 'register') {
+                alert("Verification email sent! Please check your inbox and verify before logging in.");
+                toggleAuthMode('login'); 
+            } else {
+               
+                checkSession();
+            }
         } else {
-            alert(data);
+            
+            alert(response);
         }
-    });
+    })
+    .catch(err => console.error("Error:", err));
 }
 
 function toggleAuthMode(mode) {
@@ -85,7 +107,9 @@ function logout() {
     fd.append('action', 'logout');
     fetch('auth.php', { method: 'POST', body: fd })
     .then(res => res.text())
-    .then(data => { if (data.trim() === "success") location.reload(); });
+    .then(data => {
+        if (data.trim() === "success") location.reload(); 
+    });
 }
 
 function checkSession() {
@@ -94,8 +118,9 @@ function checkSession() {
     fetch('auth.php', { method: 'POST', body: fd })
     .then(res => res.text())
     .then(data => {
-        if (data.trim() !== "not_logged_in") {
-            currentAgent = data.trim();
+        const response = data.trim();
+        if (response !== "not_logged_in" && response !== "") {
+            currentAgent = response;
             showMainMenu();
         }
     });
